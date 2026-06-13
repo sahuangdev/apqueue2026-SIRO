@@ -1,0 +1,10 @@
+node_modules
+server/node_modules
+server/data
+.git
+kiosk
+doc
+pic
+dist
+*.log
+.DS_Store

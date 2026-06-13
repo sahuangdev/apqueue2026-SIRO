@@ -1,0 +1,1 @@
+const e=require('electron'); process.stdout.write('type:'+typeof e+'\n'); if(typeof e==='object'&&e!==null){process.stdout.write('app:'+typeof e.app+'\n');}else{process.stdout.write('val:'+String(e).slice(0,60)+'\n');}

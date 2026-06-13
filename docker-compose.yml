@@ -1,0 +1,18 @@
+services:
+  queue-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apqueue-server
+    ports:
+      - "8888:8888"
+    volumes:
+      # SQLite database — bind mount เพื่อ backup ง่าย
+      - ./server/data:/app/data
+      # ไฟล์ที่ผู้ใช้อัปโหลด (โลโก้ / วิดีโอ)
+      - ./server/assets/logos:/app/assets/logos
+      - ./server/assets/media:/app/assets/media
+    environment:
+      PORT: "8888"
+      HOST: "0.0.0.0"
+    restart: unless-stopped

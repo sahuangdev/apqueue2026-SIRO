@@ -7,8 +7,10 @@
 </head>
 <body>
   <div class="kiosk">
-    <!-- จุดแตะลับมุมซ้ายบน: แตะ 5 ครั้งเพื่อเปิดหน้าตั้งค่าระบบ (สำหรับผู้ดูแล) -->
+    <!-- มุมซ้ายบน: แตะ 2 ครั้ง → ปิดโปรแกรม -->
     <div class="corner-tap" id="cornerTap"></div>
+    <!-- มุมขวาบน: แตะ 5 ครั้ง → ตั้งค่าระบบ (สำหรับผู้ดูแล) -->
+    <div class="corner-tap right" id="cornerTapRight"></div>
     <div class="offline hidden" id="offline">⚠ เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</div>
 
     <header class="siro-header">
@@ -49,6 +51,19 @@
         <div class="spinner"></div>
         <div class="ptxt" id="ptxt">กำลังพิมพ์บัตรคิว...</div>
         <div class="pnum" id="pNum"></div>
+      </div>
+    </div>
+
+    <!-- ยืนยันปิดโปรแกรม (แตะมุมซ้ายบน 2 ครั้ง) -->
+    <div class="overlay hidden" id="closePanel">
+      <div class="close-card">
+        <div class="close-icon">⏻</div>
+        <h2>ปิดโปรแกรม</h2>
+        <p class="close-desc">ต้องการปิดโปรแกรม Kiosk ใช่หรือไม่?</p>
+        <div class="close-btns">
+          <button class="cbtn danger" id="closeConfirm">ปิดโปรแกรม</button>
+          <button class="cbtn sec" id="closeCancel">ยกเลิก</button>
+        </div>
       </div>
     </div>
 

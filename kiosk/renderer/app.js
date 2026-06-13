@@ -285,9 +285,43 @@ $('#sysTest').onclick = async () => {
 
 $('#sysClose').onclick = closeSys;
 
-// แตะมุมซ้ายบน 5 ครั้งภายใน 2 วินาที -> เปิดหน้าตั้งค่าระบบ
-(function cornerTrigger() {
+// ===== ปิดโปรแกรม (แตะมุมซ้ายบน 2 ครั้ง) =====
+function openCloseDialog() {
+  stopIdle();
+  $('#closePanel').classList.remove('hidden');
+}
+function dismissCloseDialog() {
+  $('#closePanel').classList.add('hidden');
+  if (currentRoom) startIdle();
+}
+
+$('#closeConfirm').onclick = async () => {
+  try { await window.kioskAPI.quitApp(); } catch (e) { /* main process terminates — ignore */ }
+};
+$('#closeCancel').onclick = dismissCloseDialog;
+
+// มุมซ้ายบน: แตะ 2 ครั้ง -> ปิดโปรแกรม
+(function cornerLeft() {
   const zone = $('#cornerTap');
+  if (!zone) return;
+  let count = 0, timer = null;
+  const reset = () => { count = 0; if (timer) { clearTimeout(timer); timer = null; } };
+  const hit = () => {
+    count += 1;
+    if (timer) clearTimeout(timer);
+    if (count === 2) {
+      timer = setTimeout(() => { if (count === 2) { reset(); openCloseDialog(); } else reset(); }, 800);
+    } else {
+      timer = setTimeout(reset, 2000);
+    }
+  };
+  zone.addEventListener('click', hit);
+  zone.addEventListener('touchstart', (e) => { e.preventDefault(); hit(); }, { passive: false });
+})();
+
+// มุมขวาบน: แตะ 5 ครั้ง -> ตั้งค่าระบบ
+(function cornerRight() {
+  const zone = $('#cornerTapRight');
   if (!zone) return;
   let count = 0, timer = null;
   const reset = () => { count = 0; if (timer) { clearTimeout(timer); timer = null; } };

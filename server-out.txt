@@ -1,0 +1,6 @@
+
+✅ Queue 2026 server running
+   Local:   http://localhost:8888
+   LAN:     http://<server-ip>:8888
+   แดชบอร์ด /  จอแสดงผล /display  เรียกคิว /calling  ตั้งค่า /settings  รายงาน /reports  ทดสอบ kiosk /kiosk-web
+
