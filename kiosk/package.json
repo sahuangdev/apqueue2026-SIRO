@@ -8,8 +8,9 @@
   "scripts": {
     "start": "set \"ELECTRON_RUN_AS_NODE=\" & electron .",
     "dev": "set \"ELECTRON_RUN_AS_NODE=\" & set \"NODE_ENV=development\" & electron .",
-    "build": "set \"CSC_IDENTITY_AUTO_DISCOVERY=false\" & set \"WIN_CSC_LINK=\" & electron-builder --win",
-    "build:dir": "set \"CSC_IDENTITY_AUTO_DISCOVERY=false\" & electron-builder --win --dir"
+    "bundle-server": "node scripts/bundle-server.js",
+    "build": "npm run bundle-server && set \"CSC_IDENTITY_AUTO_DISCOVERY=false\" & set \"WIN_CSC_LINK=\" & electron-builder --win",
+    "build:dir": "npm run bundle-server && set \"CSC_IDENTITY_AUTO_DISCOVERY=false\" & electron-builder --win --dir"
   },
   "dependencies": {
     "node-thermal-printer": "^4.4.4",
@@ -40,7 +41,11 @@
     "files": [
       "**/*",
       "!make-icon.ps1",
-      "!dist${/*}"
+      "!dist${/*}",
+      "!server-bundle${/*}"
+    ],
+    "extraResources": [
+      { "from": "server-bundle", "to": "server-bundle", "filter": ["**/*"] }
     ]
   }
 }

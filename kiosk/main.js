@@ -15,6 +15,7 @@ const config = require('./src/config');
 const errorHandler = require('./src/error-handler');
 const windowManager = require('./src/window');
 const ipcManager = require('./src/ipc-handlers');
+const serverManager = require('./src/server-manager');
 const constants = require('./src/constants');
 
 let isQuitting = false;
@@ -51,6 +52,7 @@ async function initialize() {
 app.on('ready', async () => {
   try {
     await initialize();
+    await serverManager.start();
     windowManager.createWindow();
     logger.log('App ready - window created');
   } catch (err) {
@@ -86,6 +88,7 @@ app.on('activate', () => {
 app.on('before-quit', () => {
   isQuitting = true;
   ipcManager.cleanup();
+  serverManager.stop();
   logger.log('Application quitting');
 });
 
