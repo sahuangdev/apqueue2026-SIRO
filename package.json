@@ -13,7 +13,8 @@
     "seed": "npm --workspace server run seed",
     "kiosk": "npm --workspace kiosk run start",
     "kiosk:dev": "npm --workspace kiosk run dev",
-    "start:all": "start \"APQueue Server\" cmd /k npm run start & npm run kiosk"
+    "start:all": "start \"APQueue Server\" cmd /k npm run start & npm run kiosk",
+    "build": "npm --workspace kiosk run build"
   },
   "engines": {
     "node": ">=18"

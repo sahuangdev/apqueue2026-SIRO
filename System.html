@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>APQueue 2026 — เอกสารระบบ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#1c50b5; --blue-dark:#123a85; --blue-light:#eaf1ff;
+    --green:#1aa54e; --green-light:#e8f8ee;
+    --red:#d23030; --red-light:#fdeaea;
+    --ink:#16335f; --muted:#5b6b86; --border:#dfe5ee; --card-bg:#ffffff;
+    --bg:#f4f7fb;
+    --font:'Prompt',sans-serif; --mono:'Fira Code',monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:var(--font); scroll-behavior:smooth; }
+  a{ color:var(--blue); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+
+  /* ===== Layout ===== */
+  .layout{ display:grid; grid-template-columns:280px 1fr; min-height:100vh; }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } .sidebar{ display:none; } }
+
+  /* ===== Sidebar ===== */
+  .sidebar{ background:var(--blue-dark); color:#fff; padding:28px 22px; position:sticky; top:0; height:100vh; overflow-y:auto; }
+  .sidebar .brand{ font-size:22px; font-weight:700; margin-bottom:2px; }
+  .sidebar .brand span{ color:#7fb0ff; }
+  .sidebar .sub{ font-size:13px; color:#aac2ec; margin-bottom:28px; }
+  .sidebar nav a{ display:block; color:#dce8ff; font-size:14.5px; padding:9px 12px; border-radius:8px; margin-bottom:2px; transition:.15s; }
+  .sidebar nav a:hover{ background:rgba(255,255,255,.1); text-decoration:none; }
+  .sidebar nav a.active{ background:#fff; color:var(--blue-dark); font-weight:600; }
+  .sidebar .ver{ margin-top:28px; padding-top:18px; border-top:1px solid rgba(255,255,255,.15); font-size:12px; color:#9bb6e6; }
+
+  /* ===== Main ===== */
+  main{ padding:48px 56px 100px; max-width:980px; }
+  @media (max-width:600px){ main{ padding:28px 20px 80px; } }
+
+  .hero{ background:linear-gradient(135deg,var(--blue),#3a7ad6); color:#fff; border-radius:20px; padding:40px 44px; margin-bottom:44px; box-shadow:0 18px 40px rgba(20,60,140,.25); }
+  .hero h1{ margin:0 0 8px; font-size:32px; font-weight:700; }
+  .hero p{ margin:0; font-size:16px; color:#dfe9ff; line-height:1.6; }
+  .hero .badges{ margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
+  .badge{ background:rgba(255,255,255,.18); padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500; }
+
+  section{ margin-bottom:52px; }
+  h2{ font-size:24px; font-weight:700; color:var(--blue-dark); margin:0 0 6px; display:flex; align-items:center; gap:10px; scroll-margin-top:20px; }
+  h2 .num{ background:var(--blue); color:#fff; width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; flex:0 0 auto; }
+  h3{ font-size:18px; font-weight:600; color:var(--ink); margin:28px 0 12px; }
+  .lead{ color:var(--muted); font-size:15px; margin:0 0 22px 44px; }
+  p{ line-height:1.75; font-size:15px; }
+
+  .card{ background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:24px 26px; box-shadow:0 4px 16px rgba(20,40,80,.05); margin-bottom:18px; }
+  .card-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:700px){ .card-grid{ grid-template-columns:1fr; } }
+  .card h4{ margin:0 0 10px; font-size:16px; color:var(--blue); display:flex; align-items:center; gap:8px; }
+
+  table{ width:100%; border-collapse:collapse; margin:14px 0 22px; font-size:14.5px; }
+  th,td{ text-align:left; padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top; }
+  th{ background:var(--blue-light); color:var(--blue-dark); font-weight:600; font-size:13.5px; }
+  tr:last-child td{ border-bottom:none; }
+  td code, th code{ font-size:13px; }
+
+  code{ font-family:var(--mono); background:#eef1f6; color:#a8326b; padding:2px 7px; border-radius:5px; font-size:13.5px; }
+  pre{ background:#16213a; color:#e8edf7; border-radius:12px; padding:18px 20px; overflow-x:auto; font-family:var(--mono); font-size:13.5px; line-height:1.65; margin:14px 0 20px; box-shadow:inset 0 0 0 1px #263354; }
+  pre code{ background:none; color:inherit; padding:0; }
+
+  .callout{ display:flex; gap:12px; padding:16px 18px; border-radius:12px; margin:18px 0; font-size:14.5px; line-height:1.65; }
+  .callout.info{ background:var(--blue-light); border-left:4px solid var(--blue); }
+  .callout.warn{ background:#fff6e5; border-left:4px solid #d99a14; }
+  .callout .icon{ font-size:18px; flex:0 0 auto; }
+
+  /* flow diagram */
+  .flow{ display:flex; flex-direction:column; align-items:center; gap:0; margin:24px 0; }
+  .flow-box{ background:#fff; border:2px solid var(--blue); color:var(--blue-dark); border-radius:12px; padding:13px 22px; font-size:14px; font-weight:500; text-align:center; min-width:260px; box-shadow:0 4px 10px rgba(20,60,140,.08); }
+  .flow-box.alt{ border-color:var(--green); color:#0e6b32; background:var(--green-light); }
+  .flow-box .small{ display:block; font-size:12px; color:var(--muted); font-weight:400; margin-top:3px; }
+  .flow-arrow{ color:var(--blue); font-size:22px; line-height:1; margin:2px 0; }
+  .flow-branch{ display:flex; gap:30px; justify-content:center; flex-wrap:wrap; margin:4px 0; }
+  .flow-branch .branch-col{ display:flex; flex-direction:column; align-items:center; }
+
+  .arch-diagram{ display:grid; grid-template-columns:1fr; gap:14px; margin:24px 0; }
+  .arch-row{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .arch-box{ background:#fff; border:1.5px solid var(--border); border-radius:14px; padding:16px 20px; min-width:200px; flex:1; text-align:center; box-shadow:0 4px 10px rgba(20,40,80,.05); }
+  .arch-box.primary{ border-color:var(--blue); background:var(--blue-light); }
+  .arch-box .title{ font-weight:600; color:var(--blue-dark); margin-bottom:4px; }
+  .arch-box .desc{ font-size:12.5px; color:var(--muted); }
+  .arch-link{ text-align:center; color:var(--muted); font-size:13px; }
+
+  .filetree{ background:#16213a; color:#cfe0ff; border-radius:12px; padding:20px 24px; font-family:var(--mono); font-size:13px; line-height:1.85; overflow-x:auto; }
+  .filetree .dir{ color:#7fc4ff; font-weight:600; }
+  .filetree .cmt{ color:#7a8aa8; }
+
+  .kbd{ display:inline-block; background:#fff; border:1px solid var(--border); border-bottom-width:2px; border-radius:6px; padding:2px 8px; font-family:var(--mono); font-size:12.5px; box-shadow:0 1px 0 var(--border); }
+
+  .tag{ display:inline-block; font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; }
+  .tag.green{ background:var(--green-light); color:#0e6b32; }
+  .tag.red{ background:var(--red-light); color:var(--red); }
+  .tag.blue{ background:var(--blue-light); color:var(--blue-dark); }
+
+  footer{ text-align:center; color:var(--muted); font-size:13px; padding:30px 0 10px; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="brand">AP<span>Queue</span> 2026</div>
+    <div class="sub">เอกสารระบบ (System Docs)</div>
+    <nav id="toc">
+      <a href="#overview">1. ภาพรวมระบบ</a>
+      <a href="#prereq">2. ความต้องการของระบบ</a>
+      <a href="#install">3. วิธีติดตั้ง</a>
+      <a href="#run">4. วิธีรันระบบ</a>
+      <a href="#test">5. การทดสอบ</a>
+      <a href="#flow">6. Flow การทำงาน</a>
+      <a href="#build">7. Build / Deploy</a>
+      <a href="#troubleshoot">8. แก้ปัญหาที่พบบ่อย</a>
+      <a href="#structure">9. โครงสร้างไฟล์</a>
+    </nav>
+    <div class="ver">Kiosk v1.0.10 · SiRO Radiation Oncology</div>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <h1>APQueue 2026</h1>
+      <p>ระบบบริหารคิวผู้ป่วย แผนกรังสีรักษา — Siriraj Radiation Oncology (SiRO)<br/>เอกสารการติดตั้ง การทดสอบ การรันระบบ และสถาปัตยกรรมการทำงาน</p>
+      <div class="badges">
+        <span class="badge">⚙ Electron + Node.js</span>
+        <span class="badge">🖨 ESC/POS Thermal Printing</span>
+        <span class="badge">🔌 Socket.io Realtime</span>
+      </div>
+    </div>
+
+    <!-- 1. Overview -->
+    <section id="overview">
+      <h2><span class="num">1</span> ภาพรวมระบบ</h2>
+      <p class="lead">ระบบประกอบด้วย 2 ส่วนหลักที่ทำงานร่วมกัน</p>
+      <div class="card-grid">
+        <div class="card">
+          <h4>🖥️ Server</h4>
+          <p style="margin:0">Node.js + Express + Socket.io + <code>node:sqlite</code><br/>
+          จัดการ API, ฐานข้อมูล, และหน้าเว็บแอดมินทั้งหมด (เรียกคิว, จอแสดงผล, ตั้งค่า, รายงาน)</p>
+        </div>
+        <div class="card">
+          <h4>🖱️ Kiosk</h4>
+          <p style="margin:0">Electron Desktop App<br/>
+          ตู้กดบัตรคิวสัมผัสหน้าจอสำหรับผู้ป่วย พร้อมพิมพ์บัตรคิวจริงผ่านเครื่องพิมพ์ความร้อน</p>
+        </div>
+      </div>
+      <div class="callout info">
+        <span class="icon">💡</span>
+        <span>Kiosk เวอร์ชัน packaged (<code>Queue2026Kiosk.exe</code>) จะ<strong>สตาร์ท Server ให้อัตโนมัติ</strong>ภายในตัวเอง ไม่ต้องเปิดสองโปรแกรมแยกกัน</span>
+      </div>
+    </section>
+
+    <!-- 2. Prerequisites -->
+    <section id="prereq">
+      <h2><span class="num">2</span> ความต้องการของระบบ</h2>
+      <table>
+        <tr><th>รายการ</th><th>เวอร์ชัน</th><th>หมายเหตุ</th></tr>
+        <tr><td>Windows</td><td>10 / 11</td><td>ทดสอบบน Windows 10</td></tr>
+        <tr><td><strong>Node.js</strong></td><td><strong>LTS (22+)</strong></td><td><span class="tag red">สำคัญ</span> ต้องติดตั้งแยกแม้ใช้ตัว Kiosk.exe ที่ build แล้ว เพราะ server ใช้ <code>node:sqlite</code> ที่ต้องการ Node 22+</td></tr>
+        <tr><td>เครื่องพิมพ์ใบเสร็จ 80mm</td><td>ESC/POS (USB)</td><td>เช่น POS-80 — ติดตั้ง driver Windows ให้เรียบร้อยก่อน</td></tr>
+      </table>
+      <p>ติดตั้ง Node.js (ถ้ายังไม่มี):</p>
+      <pre><code>winget install OpenJS.NodeJS.LTS</code></pre>
+      <div class="callout warn">
+        <span class="icon">⚠️</span>
+        <span>หลังติดตั้งต้อง<strong>เปิด terminal ใหม่</strong>เพื่อให้ <code>node</code>/<code>npm</code> เข้า PATH</span>
+      </div>
+    </section>
+
+    <!-- 3. Installation -->
+    <section id="install">
+      <h2><span class="num">3</span> วิธีติดตั้ง</h2>
+
+      <h3>3.1 สำหรับใช้งานจริง <span class="tag green">แนะนำ</span></h3>
+      <div class="card">
+        <ol style="margin:0;padding-left:20px;line-height:2">
+          <li>ติดตั้ง Node.js LTS ก่อน (ดูหัวข้อ 2)</li>
+          <li>ดับเบิลคลิก <code>kiosk\dist\Queue2026Kiosk Setup x.x.x.exe</code></li>
+          <li>ตั้งค่าตามตัวติดตั้ง (เลือกโฟลเดอร์ติดตั้งได้)</li>
+          <li>เปิดแอปจาก Desktop shortcut — ระบบจะสตาร์ท Server อัตโนมัติ, เก็บฐานข้อมูลที่ <code>%APPDATA%\kiosk\</code>, และเปิด fullscreen</li>
+        </ol>
+      </div>
+
+      <h3>3.2 สำหรับพัฒนา/แก้ไขโค้ด</h3>
+      <pre><code>git clone &lt;repo&gt;
+cd andamnadev
+npm install          <span style="color:#7a8aa8"># ติดตั้ง dependencies ทุก workspace</span></code></pre>
+      <div class="filetree">
+andamnadev/<br>
+├── <span class="dir">server/</span>     <span class="cmt">← Backend (Express + Socket.io)</span><br>
+├── <span class="dir">kiosk/</span>      <span class="cmt">← Electron Kiosk app</span><br>
+└── package.json  <span class="cmt">← root, รวมคำสั่งทั้งสอง workspace</span>
+      </div>
+    </section>
+
+    <!-- 4. Running -->
+    <section id="run">
+      <h2><span class="num">4</span> วิธีรันระบบ</h2>
+
+      <h3>4.1 โหมดพัฒนา (รันจาก root)</h3>
+      <table>
+        <tr><th>คำสั่ง</th><th>ทำอะไร</th></tr>
+        <tr><td><code>npm run start</code></td><td>รัน Server อย่างเดียว (port 8888)</td></tr>
+        <tr><td><code>npm run dev</code></td><td>รัน Server โหมด dev (auto-restart เมื่อโค้ดเปลี่ยน)</td></tr>
+        <tr><td><code>npm run kiosk</code></td><td>รัน Kiosk production mode (auto-start server เอง)</td></tr>
+        <tr><td><code>npm run kiosk:dev</code></td><td>รัน Kiosk โหมด dev (DevTools: <span class="kbd">Ctrl+Shift+D</span>)</td></tr>
+        <tr><td><code>npm run start:all</code></td><td>รัน Server (หน้าต่างใหม่) + Kiosk พร้อมกัน</td></tr>
+        <tr><td><code>npm run seed</code></td><td>สร้างข้อมูลตั้งต้น (ห้อง, time slot, admin user)</td></tr>
+      </table>
+
+      <h3>4.2 โหมดใช้งานจริง</h3>
+      <p>เปิดแอป <strong>Queue2026Kiosk</strong> จาก Desktop/Start Menu shortcut — ไม่ต้องรันคำสั่งอะไรเพิ่ม</p>
+
+      <h3>4.3 หน้าเว็บแอดมิน</h3>
+      <table>
+        <tr><th>หน้า</th><th>URL</th><th>ใช้ทำอะไร</th></tr>
+        <tr><td>Dashboard</td><td><code>localhost:8888/</code></td><td>ภาพรวมระบบ, สถิติ realtime</td></tr>
+        <tr><td><strong>เรียกคิว</strong></td><td><code>localhost:8888/calling</code></td><td>หน้าที่เจ้าหน้าที่ใช้เรียกคิวผู้ป่วย</td></tr>
+        <tr><td>จอแสดงผล</td><td><code>localhost:8888/display</code></td><td>จอทีวีแสดงเลขคิว (เปิดเต็มจอ)</td></tr>
+        <tr><td>ออกบัตรคิว (web)</td><td><code>localhost:8888/kiosk-web</code></td><td>เวอร์ชันเว็บของ Kiosk (ทดสอบไม่ต้องเปิด Electron)</td></tr>
+        <tr><td>รายงาน</td><td><code>localhost:8888/reports</code></td><td>สถิติ/รายงานการใช้งาน</td></tr>
+        <tr><td><strong>ตั้งค่า</strong></td><td><code>localhost:8888/settings</code></td><td>ห้อง, time slot, โปรไฟล์บัตรคิว, โลโก้</td></tr>
+      </table>
+      <div class="callout info">
+        <span class="icon">🔑</span>
+        <span>Login เริ่มต้น: <code>admin</code> / <code>123456</code></span>
+      </div>
+      <p>เข้าจากเครื่องอื่นในวง LAN: เปลี่ยน <code>localhost</code> เป็น IP เครื่อง เช่น <code>http://192.168.1.108:8888/calling</code> (ดูหัวข้อ 7.3)</p>
+    </section>
+
+    <!-- 5. Testing -->
+    <section id="test">
+      <h2><span class="num">5</span> การทดสอบ</h2>
+
+      <h3>5.1 ทดสอบ Server (API)</h3>
+      <pre><code>curl http://localhost:8888/api/rooms
+curl http://localhost:8888/api/kiosk/config</code></pre>
+      <p>ควรได้ HTTP 200 พร้อม JSON</p>
+
+      <h3>5.2 ทดสอบหน้า Kiosk</h3>
+      <p>เปิด Kiosk → ไม่มีแถบสีแดง "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้" → กดเลือกห้อง → เลือกช่วงเวลา → ออกบัตรคิว/สั่งพิมพ์ได้</p>
+
+      <h3>5.3 ทดสอบเครื่องพิมพ์</h3>
+      <div class="card">
+        <ol style="margin:0;padding-left:20px;line-height:2">
+          <li>แตะมุม<strong>ขวาบน 5 ครั้ง</strong> เพื่อเปิดหน้า "ตั้งค่าระบบ Kiosk"</li>
+          <li>เลือกเครื่องพิมพ์จาก dropdown แล้วกด <strong>"ทดสอบพิมพ์"</strong></li>
+          <li>ควรเห็น <span class="tag green">ส่งพิมพ์แล้ว ✓</span> และได้ใบเสร็จทดสอบจริง (ภาษาไทยถูกต้อง)</li>
+        </ol>
+      </div>
+
+      <h3>5.4 จุดแตะลับ (Hidden Corner Taps)</h3>
+      <table>
+        <tr><th>มุม</th><th>แตะ</th><th>ผล</th></tr>
+        <tr><td>ซ้ายบน</td><td>5 ครั้ง</td><td>เปิดหน้าต่างยืนยัน <strong>ปิดโปรแกรม</strong></td></tr>
+        <tr><td>ขวาบน</td><td>5 ครั้ง</td><td>เปิดหน้า <strong>ตั้งค่าระบบ Kiosk</strong></td></tr>
+      </table>
+      <p>คีย์ลัดสำหรับแอดมิน (คีย์บอร์ดเสียบ):</p>
+      <p>
+        <span class="kbd">Ctrl+Shift+P</span> เปิดตั้งค่าเครื่องพิมพ์ขั้นสูง &nbsp;·&nbsp;
+        <span class="kbd">Ctrl+Shift+Q</span> ปิดโปรแกรมทันที &nbsp;·&nbsp;
+        <span class="kbd">Ctrl+Shift+D</span> DevTools (dev mode)
+      </p>
+    </section>
+
+    <!-- 6. Flow -->
+    <section id="flow">
+      <h2><span class="num">6</span> Flow การทำงานของระบบ</h2>
+
+      <h3>6.1 ภาพรวมการเชื่อมต่อ</h3>
+      <div class="arch-diagram">
+        <div class="arch-box primary" style="max-width:520px;margin:0 auto">
+          <div class="title">Queue2026Kiosk.exe</div>
+          <div class="desc">Electron Main Process + Renderer</div>
+        </div>
+        <div class="arch-link">spawn child process ↓</div>
+        <div class="arch-box" style="max-width:520px;margin:0 auto;border-color:var(--green);background:var(--green-light)">
+          <div class="title" style="color:#0e6b32">Server (node.exe ของระบบ)</div>
+          <div class="desc">Express + Socket.io · port 8888</div>
+        </div>
+        <div class="arch-row" style="margin-top:10px">
+          <div class="arch-box"><div class="title">เจ้าหน้าที่</div><div class="desc">/calling /settings (Browser)</div></div>
+          <div class="arch-box"><div class="title">จอแสดงผล</div><div class="desc">/display (TV)</div></div>
+          <div class="arch-box"><div class="title">เครื่องพิมพ์</div><div class="desc">ESC/POS raster ผ่าน USB/TCP</div></div>
+        </div>
+      </div>
+      <div class="callout info">
+        <span class="icon">❓</span>
+        <span><strong>ทำไม Server ต้องรันด้วย Node.js ของระบบ แยกจาก Electron?</strong><br/>
+        Server ใช้ <code>node:sqlite</code> (ต้องการ Node 22+) แต่ Electron 31 ฝัง Node เวอร์ชันเก่ากว่ามาให้ — จึง spawn เป็น child process แยกโดยใช้ <code>node.exe</code> ของระบบจริง (<code>kiosk/src/server-manager.js</code>)</span>
+      </div>
+
+      <h3>6.2 Flow การออกบัตรคิว (Kiosk → พิมพ์จริง)</h3>
+      <div class="flow">
+        <div class="flow-box">ผู้ป่วยเลือกห้อง → เลือกช่วงเวลา</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box">POST /api/queues <span class="small">สร้างเลขคิวในฐานข้อมูล</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box">window.kioskAPI.printTicket(...)</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-branch">
+          <div class="branch-col">
+            <div class="flow-box alt">mode: "pdf"<span class="small">render HTML → บันทึก PDF</span></div>
+          </div>
+          <div class="branch-col">
+            <div class="flow-box alt">mode: "thermal"<span class="small">render HTML (ฟอนต์ Sarabun) → PNG</span></div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box">spawn child process (node.exe)<span class="small">แปลงภาพ → ESC/POS raster (GS v 0)</span></div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box">WinSpool API (USB) / TCP socket</div>
+          </div>
+        </div>
+      </div>
+      <div class="callout info">
+        <span class="icon">🖨️</span>
+        <span><strong>ทำไมพิมพ์เป็น "ภาพ" ไม่ใช่ "ตัวอักษร"?</strong><br/>
+        เครื่องพิมพ์ใบเสร็จราคาประหยัด/โคลนจากจีน (เช่น POS-80) ส่วนใหญ่<strong>ไม่มีฟอนต์ไทยฝังในตัวเครื่อง</strong> — ถ้าส่งตัวอักษรไทยตรงๆ จะขึ้นเป็นภาษาอื่นแทน (เช่นจีน) ไม่ว่าจะตั้ง code page ใดก็ตาม จึง render เป็นภาพด้วยฟอนต์ Sarabun ในเครื่องแล้วส่งเป็นจุดภาพ (raster) ตรงๆ รับประกันว่าตัวอักษรไทยถูกต้องเสมอ</span>
+      </div>
+      <div class="callout warn">
+        <span class="icon">⚙️</span>
+        <span><strong>ทำไมต้องแยก process สำหรับแปลงภาพ?</strong><br/>
+        การแปลงภาพ→ESC/POS ต้องวนลูปทีละพิกเซล (หลักแสนรอบ) ถ้ารันใน Electron main process จะถูก watchdog ฆ่าทิ้งกลางทาง จึงแยกไปรันใน Node.js child process ต่างหาก (<code>kiosk/printer/raster-worker.js</code>)</span>
+      </div>
+
+      <h3>6.3 Flow การเรียกคิว (เจ้าหน้าที่)</h3>
+      <div class="flow">
+        <div class="flow-box">เจ้าหน้าที่เปิด /calling → กดเรียกคิว</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box">POST /api/queues/:id/call</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box">Server บันทึกสถานะ + emit Socket.io "queue:update"</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box alt">ทุก client ที่เชื่อมต่ออยู่อัปเดตทันที (จอแสดงผล ฯลฯ)<span class="small">+ เล่นเสียงประกาศจาก assets/audio/th/</span></div>
+      </div>
+
+      <h3>6.4 การ Sync ค่าตั้งค่าแบบ Realtime</h3>
+      <p>เมื่อแอดมินบันทึกการตั้งค่า (โปรไฟล์บัตรคิว, ห้อง, time slot) ที่หน้า <code>/settings</code> → server emit <code>settings:changed</code> → Kiosk และหน้าอื่นๆที่เปิดอยู่จะดึงค่าใหม่ทันที ไม่ต้อง refresh เอง</p>
+    </section>
+
+    <!-- 7. Build -->
+    <section id="build">
+      <h2><span class="num">7</span> การ Build / Deploy</h2>
+
+      <h3>7.1 Build installer ใหม่</h3>
+      <pre><code>npm run build</code></pre>
+      <p>ขั้นตอนที่เกิดขึ้นอัตโนมัติ (เรียงตามลำดับ):</p>
+      <div class="card">
+        <ol style="margin:0;padding-left:20px;line-height:2">
+          <li><strong>prebuild</strong> — bump เลขเวอร์ชัน patch (1.0.x → 1.0.x+1)</li>
+          <li><strong>bundle-server</strong> — copy <code>server/</code> + <code>npm install --omit=dev</code> ไปไว้ที่ <code>kiosk/server-bundle/</code></li>
+          <li><strong>bundle-printer-worker</strong> — copy <code>raster-worker.js</code> + ติดตั้ง dependencies ไปไว้ที่ <code>kiosk/printer-worker-bundle/</code></li>
+          <li><strong>electron-builder</strong> — สร้างไฟล์ <code>.exe</code> (NSIS installer)</li>
+          <li><strong>postbuild</strong> — ลบไฟล์ installer เวอร์ชันเก่าทั้งหมด เหลือแค่ตัวล่าสุด</li>
+        </ol>
+      </div>
+      <p>ผลลัพธ์: <code>kiosk\dist\Queue2026Kiosk Setup x.x.x.exe</code></p>
+      <div class="callout info">
+        <span class="icon">📦</span>
+        <span><strong>ทำไมต้อง bundle server/printer-worker แยก?</strong> เพราะไฟล์เหล่านี้ถูกรันด้วย <strong>system node.exe</strong> (ไม่ใช่ Electron) ซึ่งอ่านไฟล์ใน <code>app.asar</code> ไม่ได้ — ต้องเอาออกมาไว้นอก asar ผ่าน <code>extraResources</code></span>
+      </div>
+
+      <h3>7.2 Build แบบไม่สร้าง installer (ทดสอบเร็ว)</h3>
+      <pre><code>cd kiosk
+npm run build:dir</code></pre>
+      <p>ได้โฟลเดอร์ <code>kiosk\dist\win-unpacked\</code> รันตรงได้โดยไม่ต้องติดตั้ง</p>
+
+      <h3>7.3 เปิดให้เข้าถึงจากเครื่องอื่นในวง LAN</h3>
+      <p>Server bind <code>0.0.0.0</code> อยู่แล้ว (รับทุก IP) แต่ต้องเปิด Firewall เพิ่ม — รันใน <strong>PowerShell แบบ Administrator</strong>:</p>
+      <pre><code>New-NetFirewallRule -DisplayName "APQueue" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8888 -Profile Private,Domain</code></pre>
+      <p>หา IP เครื่อง:</p>
+      <pre><code>Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notmatch "Loopback" }</code></pre>
+      <p>หรือเปิดหน้า "ตั้งค่าระบบ Kiosk" (แตะมุมขวาบน 5 ครั้ง) — ช่อง "IP / ที่อยู่เซิร์ฟเวอร์" จะแสดง LAN IP ให้อัตโนมัติ</p>
+    </section>
+
+    <!-- 8. Troubleshooting -->
+    <section id="troubleshoot">
+      <h2><span class="num">8</span> การแก้ปัญหาที่พบบ่อย</h2>
+      <table>
+        <tr><th>ปัญหา</th><th>สาเหตุที่พบบ่อย</th><th>วิธีแก้</th></tr>
+        <tr><td>Kiosk ขึ้น "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้"</td><td>ไม่ได้ติดตั้ง Node.js / มี <code>node.exe</code> ค้างจับ port 8888</td><td>ติดตั้ง Node.js LTS หรือ kill <code>node.exe</code> ทั้งหมดแล้วเปิด Kiosk ใหม่</td></tr>
+        <tr><td>พิมพ์ไม่ออก / หน้าขาว</td><td>เครื่องพิมพ์ driver ไม่รองรับ GDI printing</td><td>ระบบปัจจุบันใช้ raster ESC/POS อยู่แล้ว (แก้แล้ว)</td></tr>
+        <tr><td>พิมพ์ออกแต่เป็นภาษาอื่น (เช่นจีน)</td><td>เครื่องพิมพ์ไม่มีฟอนต์ไทยในตัว</td><td>ระบบปัจจุบันพิมพ์เป็นภาพอยู่แล้ว — ถ้ายังเจอ ตรวจว่า build เป็นเวอร์ชันล่าสุด</td></tr>
+        <tr><td>ตั้งค่าระยะ/gap ติดลบแล้วไม่มีผล</td><td>เวอร์ชันเก่ามีบั๊ก clamp ค่าต่ำสุดไว้ที่ 1px</td><td>อัปเดตเป็นเวอร์ชันล่าสุด</td></tr>
+        <tr><td>Build แล้ว npm install ค้าง</td><td>เครือข่ายช้า / ไฟล์ค้างจาก build ก่อนหน้า</td><td>ลบ <code>kiosk/server-bundle</code>, <code>kiosk/printer-worker-bundle</code> แล้ว build ใหม่</td></tr>
+        <tr><td>Firewall block การเข้าจากเครื่องอื่น</td><td>ไม่ได้เปิด inbound rule</td><td>รันคำสั่งในหัวข้อ 7.3 แบบ Administrator</td></tr>
+      </table>
+    </section>
+
+    <!-- 9. File structure -->
+    <section id="structure">
+      <h2><span class="num">9</span> โครงสร้างไฟล์สำคัญ</h2>
+      <div class="filetree">
+andamnadev/<br>
+├── <span class="dir">server/</span><br>
+│&nbsp;&nbsp;├── <span class="dir">src/</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;├── index.js          <span class="cmt"># entry point, Express + Socket.io</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;├── config.js         <span class="cmt"># PORT, DB_PATH, ASSETS_DIR (override ผ่าน env ได้)</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="dir">routes/</span>           <span class="cmt"># queues, rooms, profiles, settings, ...</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;└── <span class="dir">db/</span>                <span class="cmt"># schema.sql, connection.js (node:sqlite)</span><br>
+│&nbsp;&nbsp;└── <span class="dir">public/</span>                <span class="cmt"># หน้าเว็บทั้งหมด</span><br>
+├── <span class="dir">kiosk/</span><br>
+│&nbsp;&nbsp;├── main.js                 <span class="cmt"># Electron entry point</span><br>
+│&nbsp;&nbsp;├── preload.js              <span class="cmt"># IPC bridge (contextBridge)</span><br>
+│&nbsp;&nbsp;├── <span class="dir">src/</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;├── server-manager.js   <span class="cmt"># spawn/kill bundled server child process</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;├── ipc-handlers.js     <span class="cmt"># IPC handlers ทั้งหมด</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;├── config.js           <span class="cmt"># โหลด/บันทึก config.json ของ Kiosk</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;└── window.js           <span class="cmt"># สร้างหน้าต่าง BrowserWindow</span><br>
+│&nbsp;&nbsp;├── <span class="dir">printer/</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;├── escpos.js           <span class="cmt"># ส่งคำสั่งพิมพ์ raster ไปเครื่องพิมพ์</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;├── raster-worker.js    <span class="cmt"># child process แปลงภาพ→ESC/POS</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;├── pdf.js              <span class="cmt"># render HTML บัตรคิว + บันทึก PDF</span><br>
+│&nbsp;&nbsp;│&nbsp;&nbsp;└── winraw.js           <span class="cmt"># ส่ง raw bytes ผ่าน Windows WinSpool API</span><br>
+│&nbsp;&nbsp;├── <span class="dir">renderer/</span>             <span class="cmt"># หน้าจอ Kiosk (HTML/CSS/JS)</span><br>
+│&nbsp;&nbsp;└── <span class="dir">scripts/</span>              <span class="cmt"># bundle-server.js, bundle-printer-worker.js, ...</span><br>
+└── package.json              <span class="cmt"># root — รวมคำสั่งทุก workspace</span>
+      </div>
+    </section>
+
+    <footer>APQueue 2026 — Siriraj Radiation Oncology · เอกสารนี้สร้างขึ้นเพื่อใช้งานภายในทีม</footer>
+  </main>
+</div>
+
+<script>
+  // Highlight active section in sidebar while scrolling
+  const links = [...document.querySelectorAll('#toc a')];
+  const sections = links.map(a => document.querySelector(a.getAttribute('href')));
+  function onScroll() {
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((s, i) => { if (s && s.offsetTop <= y) idx = i; });
+    links.forEach((a, i) => a.classList.toggle('active', i === idx));
+  }
+  document.addEventListener('scroll', onScroll);
+  onScroll();
+</script>
+</body>
+</html>

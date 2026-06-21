@@ -7,7 +7,7 @@
 </head>
 <body>
   <div class="kiosk">
-    <!-- มุมซ้ายบน: แตะ 2 ครั้ง → ปิดโปรแกรม -->
+    <!-- มุมซ้ายบน: แตะ 5 ครั้ง → ปิดโปรแกรม -->
     <div class="corner-tap" id="cornerTap"></div>
     <!-- มุมขวาบน: แตะ 5 ครั้ง → ตั้งค่าระบบ (สำหรับผู้ดูแล) -->
     <div class="corner-tap right" id="cornerTapRight"></div>
@@ -54,10 +54,13 @@
       </div>
     </div>
 
-    <!-- ยืนยันปิดโปรแกรม (แตะมุมซ้ายบน 2 ครั้ง) -->
+    <!-- ยืนยันปิดโปรแกรม (แตะมุมซ้ายบน 5 ครั้ง) -->
     <div class="overlay hidden" id="closePanel">
       <div class="close-card">
-        <div class="close-icon">⏻</div>
+        <svg class="close-icon" viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#d23030" stroke-width="2" stroke-linecap="round">
+          <path d="M12 3v8" />
+          <path d="M6.2 6.2a8 8 0 1 0 11.6 0" />
+        </svg>
         <h2>ปิดโปรแกรม</h2>
         <p class="close-desc">ต้องการปิดโปรแกรม Kiosk ใช่หรือไม่?</p>
         <div class="close-btns">
@@ -67,7 +70,7 @@
       </div>
     </div>
 
-    <!-- หน้าตั้งค่าระบบ (แตะมุมซ้ายบน 5 ครั้ง) — IP server / เครื่องพิมพ์ / เวลาปิดเครื่อง -->
+    <!-- หน้าตั้งค่าระบบ (แตะมุมขวาบน 5 ครั้ง) — IP server / เครื่องพิมพ์ / เวลาปิดเครื่อง -->
     <div class="overlay hidden" id="sysPanel">
       <div class="sys-card">
         <h2>ตั้งค่าระบบ Kiosk</h2>
@@ -93,7 +96,7 @@
           <button class="sbtn" id="sysTest">ทดสอบพิมพ์</button>
           <button class="sbtn sec" id="sysClose">ปิด</button>
         </div>
-        <p class="shint">แตะมุมซ้ายบน 5 ครั้งเพื่อเปิดหน้านี้ • ตั้งค่าเครื่องพิมพ์ขั้นสูง: Ctrl+Shift+P</p>
+        <p class="shint">แตะมุมขวาบน 5 ครั้งเพื่อเปิดหน้านี้ • ตั้งค่าเครื่องพิมพ์ขั้นสูง: Ctrl+Shift+P</p>
       </div>
     </div>
 

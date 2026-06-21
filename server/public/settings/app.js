@@ -317,9 +317,37 @@ TABS.profiles = async () => {
           (() => { const s = el('select', { id: 'p_def_' + p.id }, el('option', { value: '1' }, 'ใช่'), el('option', { value: '0' }, 'ไม่')); s.value = String(p.is_default); return s; })()),
         el('label', { class: 'field' }, el('span', {}, 'QR Code'), qrSel)),
       el('label', { class: 'field' }, el('span', {}, 'โลโก้'),
-        el('div', { class: 'inline' },
-          p.logo_path ? el('img', { class: 'thumb', src: p.logo_path }) : el('span', { class: 'muted' }, 'ยังไม่มีโลโก้'),
-          (() => { const fi = el('input', { type: 'file', accept: 'image/*' }); fi.onchange = async () => { const fd = new FormData(); fd.append('logo', fi.files[0]); await fetch('/api/profiles/' + p.id + '/logo', { method: 'POST', body: fd }); toast('อัปโหลดโลโก้แล้ว'); TABS.profiles(); }; return fi; })())),
+        (() => {
+          const thumb = p.logo_path ? el('img', { class: 'thumb', src: p.logo_path }) : el('span', { class: 'muted' }, 'ยังไม่มีโลโก้');
+          const fi = el('input', { type: 'file', accept: 'image/*' });
+          fi.onchange = async () => {
+            const fd = new FormData(); fd.append('logo', fi.files[0]);
+            await fetch('/api/profiles/' + p.id + '/logo', { method: 'POST', body: fd });
+            toast('อัปโหลดโลโก้แล้ว'); TABS.profiles();
+          };
+          // เลือกจากรูปที่อัปโหลดไว้แล้วก่อนหน้า (ในโฟลเดอร์ logos) โดยไม่ต้องอัปโหลดซ้ำ
+          const gallery = el('div', { class: 'logo-gallery hidden', style: 'display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;width:100%' });
+          const pickBtn = el('button', { class: 'btn sec', type: 'button' }, 'เลือกจากที่มีอยู่');
+          pickBtn.onclick = async () => {
+            const isHidden = gallery.classList.contains('hidden');
+            if (isHidden && !gallery.dataset.loaded) {
+              const logos = await api('/api/profiles/logos');
+              gallery.innerHTML = '';
+              if (!logos.length) gallery.append(el('span', { class: 'muted' }, 'ยังไม่มีโลโก้ที่อัปโหลดไว้'));
+              logos.forEach((lg) => gallery.append(el('img', {
+                src: lg.url, class: 'thumb', title: lg.name,
+                style: 'cursor:pointer;width:48px;height:48px;object-fit:contain;border:1px solid #ddd;border-radius:6px',
+                onclick: async () => {
+                  await api('/api/profiles/' + p.id + '/logo', { method: 'PUT', body: { logo_path: lg.url } });
+                  toast('เลือกโลโก้แล้ว'); TABS.profiles();
+                },
+              })));
+              gallery.dataset.loaded = '1';
+            }
+            gallery.classList.toggle('hidden');
+          };
+          return el('div', { class: 'inline', style: 'flex-wrap:wrap' }, thumb, fi, pickBtn, gallery);
+        })()),
       logoSizeRow,
       spacingRow,
       lineGapRow,

@@ -8,6 +8,7 @@ server/assets/logos/*
 !server/assets/logos/.gitkeep
 kiosk/config.json
 kiosk/server-bundle/
+kiosk/printer-worker-bundle/
 kiosk/tickets-pdf/*.pdf
 dist/
 *.log

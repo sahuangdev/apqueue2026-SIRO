@@ -49,6 +49,37 @@ class ServerManager {
     return path.join(__dirname, '..', '..', 'server');
   }
 
+  copyRecursive(src, dest) {
+    const stat = fs.statSync(src);
+    if (stat.isDirectory()) {
+      fs.mkdirSync(dest, { recursive: true });
+      for (const entry of fs.readdirSync(src)) {
+        this.copyRecursive(path.join(src, entry), path.join(dest, entry));
+      }
+    } else {
+      fs.copyFileSync(src, dest);
+    }
+  }
+
+  /**
+   * Installed app lives under Program Files (read-only at runtime).
+   * Logo/media uploads need a writable assets folder, so copy the
+   * bundled assets (audio, default folders) into userData once and
+   * point the server there via ASSETS_DIR.
+   */
+  ensureWritableAssetsDir(serverRoot) {
+    const assetsDir = path.join(app.getPath('userData'), 'server-data', 'assets');
+    if (!fs.existsSync(assetsDir)) {
+      const bundledAssets = path.join(serverRoot, 'assets');
+      if (fs.existsSync(bundledAssets)) {
+        this.copyRecursive(bundledAssets, assetsDir);
+      } else {
+        fs.mkdirSync(assetsDir, { recursive: true });
+      }
+    }
+    return assetsDir;
+  }
+
   isPortOpen() {
     return new Promise((resolve) => {
       const socket = net.createConnection({ host: HOST, port: PORT, timeout: 800 });
@@ -80,11 +111,16 @@ class ServerManager {
     const dbDir = path.join(app.getPath('userData'), 'server-data');
     fs.mkdirSync(dbDir, { recursive: true });
 
-    logger.log('Starting bundled server', { entry, nodeExe, dbDir });
+    const env = { ...process.env, PORT: String(PORT), HOST: '0.0.0.0', DB_PATH: path.join(dbDir, 'queue.db') };
+    if (app.isPackaged) {
+      env.ASSETS_DIR = this.ensureWritableAssetsDir(serverRoot);
+    }
+
+    logger.log('Starting bundled server', { entry, nodeExe, dbDir, assetsDir: env.ASSETS_DIR });
 
     this.child = spawn(nodeExe, ['--no-warnings=ExperimentalWarning', entry], {
       cwd: serverRoot,
-      env: { ...process.env, PORT: String(PORT), HOST: '0.0.0.0', DB_PATH: path.join(dbDir, 'queue.db') },
+      env,
       windowsHide: true,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -99,18 +135,31 @@ class ServerManager {
   }
 
   stop() {
-    if (!this.child) return;
-    logger.log('Stopping bundled server', { pid: this.child.pid });
-    try {
-      if (process.platform === 'win32') {
-        execSync(`taskkill /pid ${this.child.pid} /T /F`);
-      } else {
-        this.child.kill('SIGTERM');
+    if (this.child) {
+      logger.log('Stopping bundled server', { pid: this.child.pid });
+      try {
+        if (process.platform === 'win32') {
+          execSync(`taskkill /pid ${this.child.pid} /T /F`);
+        } else {
+          this.child.kill('SIGTERM');
+        }
+      } catch (e) {
+        logger.warn('Error stopping server process', e);
       }
-    } catch (e) {
-      logger.warn('Error stopping server process', e);
+      this.child = null;
     }
-    this.child = null;
+
+    // กวาด node.exe ที่หลงเหลือทั้งหมด (เช่น raster-worker.js ตอนพิมพ์ที่ยังไม่จบ,
+    // หรือ server child ที่หลุดการติดตามตอนแอป crash) — กันไม่ให้มี process ค้าง
+    // จับ port 8888 ไว้แบบครึ่งตายจนเปิดแอปครั้งต่อไปเชื่อม server ไม่ได้
+    if (process.platform === 'win32') {
+      try {
+        execSync('taskkill /F /IM node.exe /T', { stdio: 'ignore' });
+        logger.log('Killed all lingering node.exe processes on quit');
+      } catch (e) {
+        // exit code ไม่ใช่ 0 ก็ต่อเมื่อไม่มี node.exe เหลืออยู่แล้ว — ไม่ต้อง warn
+      }
+    }
   }
 }
 

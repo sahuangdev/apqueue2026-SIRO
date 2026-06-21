@@ -48,12 +48,28 @@ module.exports = function profilesRouter(io) {
     res.json({ ok: true });
   });
 
+  // รายการรูปโลโก้ที่อัปโหลดไว้แล้วทั้งหมด — ให้เลือกใช้ซ้ำได้โดยไม่ต้องอัปโหลดใหม่
+  router.get('/logos', (req, res) => {
+    const files = fs.readdirSync(LOGO_DIR)
+      .filter((f) => /\.(png|jpe?g|gif|webp|svg)$/i.test(f))
+      .sort()
+      .reverse();
+    res.json(files.map((name) => ({ name, url: '/assets/logos/' + name })));
+  });
+
   // อัปโหลดโลโก้
   router.post('/:id/logo', upload.single('logo'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'no file' });
     const rel = '/assets/logos/' + path.basename(req.file.path);
     db.prepare('UPDATE ticket_profiles SET logo_path=? WHERE id=?').run(rel, req.params.id);
     res.json({ ok: true, logo_path: rel });
+  });
+
+  // เลือกโลโก้ที่มีอยู่แล้ว (ไม่ต้องอัปโหลดใหม่)
+  router.put('/:id/logo', (req, res) => {
+    const { logo_path = '' } = req.body;
+    db.prepare('UPDATE ticket_profiles SET logo_path=? WHERE id=?').run(logo_path, req.params.id);
+    res.json({ ok: true, logo_path });
   });
 
   return router;

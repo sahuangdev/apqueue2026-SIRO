@@ -222,7 +222,14 @@ async function openSys() {
   sysSetMsg('');
   let cfg = {};
   try { cfg = await window.kioskAPI.getAppConfig() || {}; } catch (e) {}
-  sys.server.value = cfg.serverUrl || SERVER;
+  let serverUrlDisplay = cfg.serverUrl || SERVER;
+  // แสดง LAN IP ของเครื่องแทน localhost/127.0.0.1 — ให้แอดมินรู้ว่าเครื่องอื่น
+  // ในวงเดียวกันต้องต่อที่ไหน โดยไม่ต้องไปเปิด cmd เช็คเอง
+  try {
+    const lanIp = await window.kioskAPI.getLanIp();
+    if (lanIp) serverUrlDisplay = serverUrlDisplay.replace(/localhost|127\.0\.0\.1/i, lanIp);
+  } catch (e) {}
+  sys.server.value = serverUrlDisplay;
   sys.shutdown.value = cfg.shutdownTime || '';
   // เติม dropdown เครื่องพิมพ์: ตัวเลือก PDF + เครื่องพิมพ์ใน Windows
   const curIface = (cfg.printer && cfg.printer.interface) || '';
@@ -285,7 +292,7 @@ $('#sysTest').onclick = async () => {
 
 $('#sysClose').onclick = closeSys;
 
-// ===== ปิดโปรแกรม (แตะมุมซ้ายบน 2 ครั้ง) =====
+// ===== ปิดโปรแกรม (แตะมุมซ้ายบน 5 ครั้ง) =====
 function openCloseDialog() {
   stopIdle();
   $('#closePanel').classList.remove('hidden');
@@ -300,7 +307,7 @@ $('#closeConfirm').onclick = async () => {
 };
 $('#closeCancel').onclick = dismissCloseDialog;
 
-// มุมซ้ายบน: แตะ 2 ครั้ง -> ปิดโปรแกรม
+// มุมซ้ายบน: แตะ 5 ครั้ง -> ปิดโปรแกรม
 (function cornerLeft() {
   const zone = $('#cornerTap');
   if (!zone) return;
@@ -309,11 +316,8 @@ $('#closeCancel').onclick = dismissCloseDialog;
   const hit = () => {
     count += 1;
     if (timer) clearTimeout(timer);
-    if (count === 2) {
-      timer = setTimeout(() => { if (count === 2) { reset(); openCloseDialog(); } else reset(); }, 800);
-    } else {
-      timer = setTimeout(reset, 2000);
-    }
+    timer = setTimeout(reset, 2000);
+    if (count >= 5) { reset(); openCloseDialog(); }
   };
   zone.addEventListener('click', hit);
   zone.addEventListener('touchstart', (e) => { e.preventDefault(); hit(); }, { passive: false });

@@ -59,12 +59,12 @@ main{ flex:1; display:flex; flex-direction:column; padding:6px 36px 26px; min-he
 .corner-tap{ position:absolute; top:0; left:0; width:90px; height:90px; z-index:40; background:transparent; }
 .corner-tap.right{ left:auto; right:0; }
 
-/* ===== หน้าต่างยืนยันปิดโปรแกรม (แตะมุมซ้ายบน 2 ครั้ง) ===== */
+/* ===== หน้าต่างยืนยันปิดโปรแกรม (แตะมุมซ้ายบน 5 ครั้ง) ===== */
 #closePanel{ cursor:auto; background:rgba(22,51,95,.88); }
 #closePanel *{ cursor:auto; }
 .close-card{ background:#fff; border-radius:24px; padding:40px 44px; width:460px; max-width:90%;
   text-align:center; box-shadow:0 24px 60px rgba(20,40,80,.40); }
-.close-icon{ font-size:52px; line-height:1; margin-bottom:12px; color:#d23030; }
+.close-icon{ display:block; margin:0 auto 12px; }
 .close-card h2{ color:var(--ink); font-weight:500; font-size:30px; margin-bottom:10px; }
 .close-desc{ font-size:20px; color:#5b6b86; margin-bottom:28px; }
 .close-btns{ display:flex; flex-direction:column; gap:14px; }

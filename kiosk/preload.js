@@ -11,6 +11,7 @@ const kioskAPI = {
   getAppConfig: () => ipcRenderer.invoke('get-app-config'),
   saveAppConfig: (patch) => ipcRenderer.invoke('save-app-config', patch),
   applyServerConfig: (cfg) => ipcRenderer.invoke('apply-server-config', cfg),
+  getLanIp: () => ipcRenderer.invoke('get-lan-ip'),
 
   // Printer
   printTicket: (payload) => ipcRenderer.invoke('print-ticket', payload),

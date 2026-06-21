@@ -1,6 +1,6 @@
 {
   "name": "kiosk",
-  "version": "1.0.0",
+  "version": "1.0.10",
   "private": true,
   "description": "Queue 2026 Kiosk (Electron + ESC/POS thermal printer)",
   "author": "Queue 2026",
@@ -9,8 +9,11 @@
     "start": "set \"ELECTRON_RUN_AS_NODE=\" & electron .",
     "dev": "set \"ELECTRON_RUN_AS_NODE=\" & set \"NODE_ENV=development\" & electron .",
     "bundle-server": "node scripts/bundle-server.js",
-    "build": "npm run bundle-server && set \"CSC_IDENTITY_AUTO_DISCOVERY=false\" & set \"WIN_CSC_LINK=\" & electron-builder --win",
-    "build:dir": "npm run bundle-server && set \"CSC_IDENTITY_AUTO_DISCOVERY=false\" & electron-builder --win --dir"
+    "bundle-printer-worker": "node scripts/bundle-printer-worker.js",
+    "prebuild": "npm version patch --no-git-tag-version",
+    "build": "npm run bundle-server && npm run bundle-printer-worker && set \"CSC_IDENTITY_AUTO_DISCOVERY=false\" & set \"WIN_CSC_LINK=\" & electron-builder --win",
+    "postbuild": "node scripts/clean-old-builds.js",
+    "build:dir": "npm run bundle-server && npm run bundle-printer-worker && set \"CSC_IDENTITY_AUTO_DISCOVERY=false\" & electron-builder --win --dir"
   },
   "dependencies": {
     "node-thermal-printer": "^4.4.4",
@@ -42,10 +45,24 @@
       "**/*",
       "!make-icon.ps1",
       "!dist${/*}",
-      "!server-bundle${/*}"
+      "!server-bundle${/*}",
+      "!printer-worker-bundle${/*}"
     ],
     "extraResources": [
-      { "from": "server-bundle", "to": "server-bundle", "filter": ["**/*"] }
+      {
+        "from": "server-bundle",
+        "to": "server-bundle",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "printer-worker-bundle",
+        "to": "printer-worker-bundle",
+        "filter": [
+          "**/*"
+        ]
+      }
     ]
   }
 }

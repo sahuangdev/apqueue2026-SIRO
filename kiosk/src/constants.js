@@ -12,6 +12,7 @@ module.exports = {
     GET_APP_CONFIG: 'get-app-config',
     SAVE_APP_CONFIG: 'save-app-config',
     APPLY_SERVER_CONFIG: 'apply-server-config',
+    GET_LAN_IP: 'get-lan-ip',
     
     // Printer
     PRINT_TICKET: 'print-ticket',
